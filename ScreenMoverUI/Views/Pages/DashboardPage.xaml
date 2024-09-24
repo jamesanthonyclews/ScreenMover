@@ -1,0 +1,172 @@
+﻿<Page
+    x:Class="ScreenMover.Views.Pages.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ScreenMover.Views.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Title="Overview"
+    d:DataContext="{d:DesignInstance local:DashboardPage,
+                                     IsDesignTimeCreatable=False}"
+    d:DesignHeight="500"
+    d:DesignWidth="800"
+    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
+    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Page.Resources>
+
+        <StackPanel VerticalAlignment="Top" HorizontalAlignment="Stretch">
+
+        <StackPanel>
+            <ui:TextBlock FontTypography="BodyStrong">Service Status</ui:TextBlock>
+            <ui:Card Margin="0,10" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" Margin="0">
+                        <TextBlock Visibility="{Binding ViewModel.ScreenMoverService.Started, Converter={StaticResource BoolToVis}}" Text="Service Is Running"/>
+                    </WrapPanel>
+                    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="2" Margin="0">
+                        <ui:Button Margin="5" MinHeight="50" MinWidth="100" Command="{Binding ViewModel.RefreshCommand}" IsEnabled="{Binding ViewModel.ScreenMoverService.Started}">Refresh</ui:Button>
+                        <ui:Button Margin="5" MinHeight="50" MinWidth="100" Command="{Binding ViewModel.StartCommand}" IsEnabled="{Binding ViewModel.ScreenMoverService.Stopped}">Start</ui:Button>
+                        <ui:Button Margin="5" MinHeight="50" MinWidth="100" Command="{Binding ViewModel.StopCommand}" IsEnabled="{Binding ViewModel.ScreenMoverService.Started}">Stop</ui:Button>
+                    </WrapPanel>
+                </Grid>
+            
+            </ui:Card>
+        </StackPanel>
+
+     
+        <StackPanel Margin="0,10,0,0">
+            <ui:TextBlock FontTypography="BodyStrong">Configured Screens</ui:TextBlock>
+            <Grid>
+                
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <ui:Card Margin="0,10,0,0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Top" HorizontalContentAlignment="Stretch" Grid.Column="0">
+                    <ListView ItemsSource="{Binding ViewModel.ScreenMoverService.Configuration.Screens}" VerticalAlignment="Top" VerticalContentAlignment="Stretch" SelectedItem="{Binding ViewModel.SelectedScreenConfiguration}" Grid.Column="0">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding AppName}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    
+                </ui:Card>
+     
+                
+                    <StackPanel Grid.Column="1" Margin="0,10,0,0">
+                    <ui:Card Margin="0,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Application Name"/>
+                            <ui:TextBox Icon="Rename16" IconPlacement="Left" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" MinWidth="300" Text="{Binding ViewModel.SelectedScreenConfiguration.AppName}"/>
+                        </Grid>
+                    </ui:Card>
+                    <ui:Card Margin="0,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Move Application" Margin="0"/>
+                            <ui:ToggleSwitch Grid.Column="1" HorizontalAlignment="Right" IsChecked="{Binding ViewModel.SelectedScreenConfiguration.MoveApp}"/>
+                        </Grid>
+                    </ui:Card>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                    <ui:Card Margin="0,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="X Position" Margin="0"/>
+                            <ui:TextBox Grid.Column="1" MinWidth="80" HorizontalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding ViewModel.SelectedScreenConfiguration.XPos}"/>
+                        </Grid>
+                    </ui:Card>
+                    
+                    <ui:Card Margin="0,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Y Position" Margin="0"/>
+                            <ui:TextBox Grid.Column="1" MinWidth="80" HorizontalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding ViewModel.SelectedScreenConfiguration.YPos}"/>
+                        </Grid>
+                    </ui:Card>
+                    </Grid>
+                        
+                    <ui:Card Margin="0,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Resize Application" Margin="0"/>
+                            <ui:ToggleSwitch Grid.Column="1"  HorizontalAlignment="Right" IsChecked="{Binding ViewModel.SelectedScreenConfiguration.ResizeApp}"/>
+                        </Grid>
+                    </ui:Card>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    <ui:Card Margin="0,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Width" Margin="0"/>
+                            <ui:TextBox Grid.Column="1" MinWidth="80" HorizontalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding ViewModel.SelectedScreenConfiguration.XSize}"/>
+                        </Grid>
+                    </ui:Card>
+                    <ui:Card Margin="0,0,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Grid.Column="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="Height" Margin="0"/>
+                            <ui:TextBox Grid.Column="1" MinWidth="80" HorizontalContentAlignment="Center" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding ViewModel.SelectedScreenConfiguration.YSize}"/>
+                        </Grid>
+                    </ui:Card>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+            
+
+        <ui:Card Margin="0,0">
+            <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0">
+                <ui:ToggleSwitch Margin="5" Content="Autostart" OffContent="Off" OnContent="On" IsChecked="{Binding ViewModel.ScreenMoverService.Configuration.AutoStart, Mode=TwoWay}" />
+                <ui:Button Margin="5" Command="{Binding ViewModel.AddCommand}">Add</ui:Button>
+                <ui:Button Margin="5" Command="{Binding ViewModel.DeleteCommand}">Delete</ui:Button>
+                <ui:Button Margin="5" Command ="{Binding ViewModel.SaveCommand}">Save Config</ui:Button>
+            </WrapPanel>
+        </ui:Card>
+     
+
+
+
+    </StackPanel>
+</Page>
