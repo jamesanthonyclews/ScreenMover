@@ -26,6 +26,12 @@ namespace ScreenMover.Models
         private int _xSize = 0;
         [ObservableProperty]
         private int _ySize = 0;
+        [ObservableProperty]
+        private bool _pollForDefaultPos = false;
+        [ObservableProperty]
+        private int _defaultXPos = 0;
+        [ObservableProperty]
+        private int _defaultYPos = 0;
 
 
     }

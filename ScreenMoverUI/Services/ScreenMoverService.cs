@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using ScreenMover.Models;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using WindowScrape.Static;
 
 namespace ScreenMover.Services
@@ -36,19 +38,24 @@ namespace ScreenMover.Services
 
         [ObservableProperty]
         private bool _Started = false;
+
         partial void OnStartedChanged(bool value)
         {
             Stopped = !value;
         }
 
         [ObservableProperty]
-        private bool _Stopped = false;
+        private bool _Stopped = true;
+
+        private ILogger<ScreenMoverService> _logger;
         
 
         private string _configFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.CommonDocuments)}\\ScreenMover\\config.json";
 
-        public ScreenMoverService()
+        public ScreenMoverService(ILogger<ScreenMoverService> logger)
         {
+            _logger = logger;
+
             if(File.Exists(_configFilePath))
             {
                 string jsonText = File.ReadAllText(_configFilePath);
@@ -69,6 +76,22 @@ namespace ScreenMover.Services
 
             WindowHookNet.Instance.WindowCreated += OnWindowCreated;
 
+            System.Windows.Threading.DispatcherTimer pollTimer = new DispatcherTimer();
+            pollTimer.Tick += new EventHandler(pollTimerTick);
+            pollTimer.Interval = new TimeSpan(1000000);
+            pollTimer.Start();
+
+        }
+
+        private void pollTimerTick(object? sender, EventArgs e)
+        {
+            if(Started)
+            {
+                foreach (ScreenConfiguration screen in Configuration.Screens)
+                {
+                    UpdateScreen(screen.AppName, false);
+                }
+            }
         }
 
         public void LoadConfiguration(ScreenMoverApplicationConfiguration config)
@@ -113,11 +136,14 @@ namespace ScreenMover.Services
 
         void OnWindowCreated(object sender, WindowHookEventArgs e)
         {
+
+            _logger.LogDebug($"{e.WindowTitle} Created..., X was {HwndInterface.GetHwndPos(HwndInterface.GetHwndFromTitle(e.WindowTitle)).X}, Y was {HwndInterface.GetHwndPos(HwndInterface.GetHwndFromTitle(e.WindowTitle)).Y}");
+
             if (Started)
             {
                 if (Configuration.Screens.Any(x => x.AppName == e.WindowTitle))
                 {
-                    UpdateScreen(e.WindowTitle);
+                    UpdateScreen(e.WindowTitle,true);
                 }
             }
         }
@@ -128,13 +154,13 @@ namespace ScreenMover.Services
             {
                 foreach (ScreenConfiguration screen in Configuration.Screens)
                 {
-                    UpdateScreen(screen.AppName);
+                    UpdateScreen(screen.AppName,true);
                 }
             }
 
         }
 
-        private void UpdateScreen(string title)
+        private void UpdateScreen(string title, bool force)
         {
             if (Started)
             {
@@ -144,7 +170,7 @@ namespace ScreenMover.Services
                 {
                     foreach (IntPtr window in windows)
                     {
-                        if (HwndInterface.GetHwndTitle(window) == title)
+                        if ((HwndInterface.GetHwndTitle(window) == title) && (force || (screen.PollForDefaultPos && screen.DefaultXPos == HwndInterface.GetHwndPos(window).X && screen.DefaultYPos == HwndInterface.GetHwndPos(window).Y) ))
                         {
                             if (screen.MoveApp)
                             {

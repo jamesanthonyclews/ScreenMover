@@ -5,7 +5,9 @@
 
 using ScreenMover.Models;
 using ScreenMover.Services;
+using System.Drawing;
 using System.Runtime.CompilerServices;
+using WindowScrape.Static;
 
 namespace ScreenMover.ViewModels.Pages
 {
@@ -71,6 +73,24 @@ namespace ScreenMover.ViewModels.Pages
         private void Save()
         {
             ScreenMoverService.SaveConfiguration();
+        }
+
+        [RelayCommand]
+        private void Teach()
+        {
+            if(SelectedScreenConfiguration != null)
+            {
+                try
+                {
+                    System.Drawing.Point pos = HwndInterface.GetHwndPos(HwndInterface.GetHwndFromTitle(SelectedScreenConfiguration.AppName));
+                    SelectedScreenConfiguration.DefaultXPos = pos.X;
+                    SelectedScreenConfiguration.DefaultYPos = pos.Y;
+                }
+                catch (Exception ex)
+                {
+                    //don't do anything. we could bring up a message later.
+                }
+            }
         }
 
     }

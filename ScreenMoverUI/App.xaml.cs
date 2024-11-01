@@ -6,11 +6,13 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using ScreenMover.Services;
 using ScreenMover.ViewModels.Pages;
 using ScreenMover.ViewModels.Windows;
 using ScreenMover.Views.Pages;
 using ScreenMover.Views.Windows;
+using Serilog;
 using System.IO;
 using System.Reflection;
 using System.Windows.Threading;
@@ -21,6 +23,8 @@ namespace ScreenMover
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
+    /// 
+
     public partial class App
     {
         // The.NET Generic Host provides dependency injection, configuration, logging, and other services.
@@ -30,7 +34,11 @@ namespace ScreenMover
         // https://docs.microsoft.com/dotnet/core/extensions/logging
         private static readonly IHost _host = Host
             .CreateDefaultBuilder()
-            .ConfigureAppConfiguration(c => { c.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)); })
+            .ConfigureAppConfiguration(c =>
+            {
+                c.AddJsonFile("appsettings.json");
+                c.AddEnvironmentVariables();
+            })
             .ConfigureServices((context, services) =>
             {
                 services.AddHostedService<ApplicationHostService>();
@@ -59,9 +67,16 @@ namespace ScreenMover
                 services.AddSingleton<SettingsPage>();
                 services.AddSingleton<SettingsViewModel>();
 
-                
+                services.AddSerilog(
+                    (services, loggerConfiguration) => loggerConfiguration
+                        .ReadFrom.Configuration(context.Configuration)
+                        .Enrich.FromLogContext()
+                );
 
-            }).Build();
+
+
+            })
+            .Build();
 
         /// <summary>
         /// Gets registered service.

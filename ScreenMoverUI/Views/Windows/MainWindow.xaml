@@ -10,7 +10,7 @@
     xmlns:bh="http://schemas.microsoft.com/xaml/behaviors" xmlns:windows="clr-namespace:ScreenMover.ViewModels.Windows"
     Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
     Width="1000"
-    Height="730"
+    Height="870"
     d:DataContext="{d:DesignInstance windows:MainWindowViewModel,
                                      IsDesignTimeCreatable=True}"
     d:DesignHeight="650"
